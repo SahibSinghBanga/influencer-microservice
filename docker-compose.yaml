@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   ambassador_backend:
     build: .
@@ -25,6 +24,21 @@ services:
     networks:
       - ambassador
 
+  ambassador_queue:
+    build: .
+    command: 'php artisan queue:work'
+    environment:
+      CACHE_DRIVER: file
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      - ambassador_db
+    networks:
+      - ambassador
+      - users
+    restart: always
+
   redis:
     image: redis
     ports:
@@ -34,6 +48,6 @@ services:
 
 networks:
   users:
-    external:
-      name: users
+    name: users
+    external: true
   ambassador:
